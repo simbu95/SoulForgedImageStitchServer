@@ -1,10 +1,13 @@
 import json
 import os
 from Stitch import resizeImage
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageDraw
+search_dir = "jpgs/"
 fileList = os.listdir('jpgs/')
-startFile = "3878924"
+fileList.sort(key=lambda x: os.path.getmtime('jpgs/' + x))
+#startFile = "3878924"
 #startFile = "3880088"
+startFile = "4423"
 Bounds = {"minx" : 0, "miny": 0, "maxx": 0, "maxy": 0}
 
 def NodeWalk(Offsets, Bounds, Adj, currentNode):
@@ -34,6 +37,7 @@ with open("sample.json", "r") as mapFile:
     
     mask = Image.open('Mask.png').convert('L')
     Canvas = Image.new('RGBA', (new_width, new_height), (0,0,0,0))
+    centers = {}
     for file in fileList:
         node, ext = os.path.splitext(file)
         if node in Offsets:
@@ -46,13 +50,17 @@ with open("sample.json", "r") as mapFile:
             diffy = Offsets[node][1] - Bounds["miny"]
             
             Canvas.paste(addIM, (diffx, diffy), addIM)
-    
+            center = addIM.size[0]/2
+            centers[node] = ((diffx + center)/4, (diffy + center)/4)
     Canvas = Canvas.reduce(4)
+    draw = ImageDraw.Draw(Canvas)
+    for cen in centers.keys():
+        draw.ellipse((centers[cen][0]-10,centers[cen][1]-10,centers[cen][0]+10,centers[cen][1]+10), fill = 'red')
     imageBox = Canvas.getbbox()
     cropped = Canvas.crop(imageBox)
     cropped.save('map.png')
     cropped.show()
    
-    json_object = json.dumps(Offsets, indent=2)
-    with open("offsets.json", "w") as outfile:
+    json_object = json.dumps(centers, indent=2)
+    with open("centers.json", "w") as outfile:
         outfile.write(json_object)

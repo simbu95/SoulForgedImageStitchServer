@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import ipdb
 from Stitch import ImageOffset
 
 Adjacent = {}
@@ -45,6 +46,15 @@ for node in Adjacent.keys():
                     Adjacent[dest][node]["offset"] = (-offset[0],-offset[1])
                 else:
                     print("Error, couldn't find a match, investigate:" + node + "," + dest)
+missing = set(nodeMapping.keys()) - set(nodeList)
+missList = []
+for miss in missing:
+    missList.append(nodeMapping[miss])
+missList.sort()
 json_object = json.dumps(Adjacent, indent=2)
 with open("sample.json", "w") as outfile:
     outfile.write(json_object)
+
+miss_object = json.dumps(missList, indent=2)
+with open("misses.json", "w") as outfile:
+    outfile.write(miss_object)

@@ -61,23 +61,15 @@ mime-type: {}
 ''' .format(size, ufile.filename, ufile.content_type, data)
         return out
 
-
-cherrypy.log.screen = None
-host = '0.0.0.0'
-http_port = 80
-cherrypy.server.unsubscribe()
 cherrypy_cors.install()
 #  Setup the HTTP server that will always run
-http_server = cherrypy._cpserver.Server()
-http_server.socket_port = http_port
-http_server._socket_host = host
-http_server.subscribe()
-
-cherrypy.tree.mount(myWebServer(), '/', {'/': {'cors.expose.on': True}})
+server_config={
+        'server.socket_host': '0.0.0.0',
+        'server.socket_port':443,
+        'server.ssl_module':'builtin',
+        'server.ssl_certificate':'certificate.pem',
+        'server.ssl_private_key':'key.pem'
+    }
+cherrypy.config.update(server_config)
+cherrypy.quickstart(myWebServer(), '/', {'/': {'cors.expose.on': True}})
 print('Web Server is running')
-if hasattr(cherrypy.engine, "console_control_handler"):
-    cherrypy.engine.console_control_handler.subscribe()
-
-#  Start / run the server
-cherrypy.engine.start()
-cherrypy.engine.block()
