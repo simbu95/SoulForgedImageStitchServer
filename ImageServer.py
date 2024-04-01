@@ -19,7 +19,7 @@ class myWebServer(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     @cherrypy.tools.json_in()
-    def SubmitNodeData(self):
+    def hashLink(self):
         if cherrypy.request.method == 'OPTIONS':
             cherrypy_cors.preflight(allowed_methods=['GET', 'POST'])
         
