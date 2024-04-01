@@ -5,9 +5,9 @@ from PIL import Image, ImageOps, ImageDraw
 search_dir = "jpgs/"
 fileList = os.listdir('jpgs/')
 fileList.sort(key=lambda x: os.path.getmtime('jpgs/' + x))
-#startFile = "3878924"
+startFile = "3878924"
 #startFile = "3880088"
-startFile = "4423"
+#startFile = "23377"
 Bounds = {"minx" : 0, "miny": 0, "maxx": 0, "maxy": 0}
 
 def NodeWalk(Offsets, Bounds, Adj, currentNode):
@@ -53,12 +53,12 @@ with open("sample.json", "r") as mapFile:
             center = addIM.size[0]/2
             centers[node] = ((diffx + center)/4, (diffy + center)/4)
     Canvas = Canvas.reduce(4)
-    draw = ImageDraw.Draw(Canvas)
-    for cen in centers.keys():
-        draw.ellipse((centers[cen][0]-10,centers[cen][1]-10,centers[cen][0]+10,centers[cen][1]+10), fill = 'red')
     imageBox = Canvas.getbbox()
     cropped = Canvas.crop(imageBox)
     cropped.save('map.png')
+    draw = ImageDraw.Draw(cropped)
+    for cen in centers.keys():
+        draw.ellipse((centers[cen][0]-10,centers[cen][1]-10,centers[cen][0]+10,centers[cen][1]+10), fill = 'red')
     cropped.show()
    
     json_object = json.dumps(centers, indent=2)
