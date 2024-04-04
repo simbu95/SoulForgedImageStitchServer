@@ -64,11 +64,11 @@ mime-type: {}
 cherrypy_cors.install()
 #  Setup the HTTP server that will always run
 server_config={
-        'server.socket_host': '0.0.0.0',
-        'server.socket_port':443,
-        'server.ssl_module':'builtin',
-        'server.ssl_certificate':'certificate.pem',
-        'server.ssl_private_key':'key.pem'
+        'server.socket_host': '127.0.0.1',
+        'server.socket_port': 8080,
+#        'server.ssl_module':'builtin',
+#        'server.ssl_certificate':'certificate.pem',
+#        'server.ssl_private_key':'key.pem'
     }
 cherrypy.config.update(server_config)
 cherrypy.quickstart(myWebServer(), '/', {'/': {'cors.expose.on': True}})

@@ -1,20 +1,24 @@
 import requests
 import json
 import os
-import ipdb
 from Stitch import ImageOffset
 
 Adjacent = {}
+print("start")
 with open("sample.json", "r") as mapFile:
     Adjacent = json.load(mapFile)
 
+
+print("file Open")
 with requests.Session() as s:
     p = s.post("https://soul-forged-resourcs-map.vercel.app/getDataSet", data={"item": "mapRouteMain"})
     MapPaths = json.loads(p.text.replace("\'", "\""))
+    print("Path Dataset")
     
     p = s.post("https://soul-forged-resourcs-map.vercel.app/getDataSet", data={"item": "nodeMaping"})
     nodeMapping = json.loads(p.text.replace("\'", "\""))
     nodeMap = dict((v,k) for k,v in nodeMapping.items())
+    print("Node Dataset")
     
     for path in MapPaths:
         if path['start'] in nodeMap and path['end'] in nodeMap:
@@ -30,6 +34,7 @@ with requests.Session() as s:
             if not nodeMap[path['start']] in Adjacent[nodeMap[path['end']]]:
                 Adjacent[nodeMap[path['end']]][nodeMap[path['start']]] = {}
 
+print("Image Start")
 myjpgs = os.listdir('jpgs/')
 nodeList = []
 for file in myjpgs:
