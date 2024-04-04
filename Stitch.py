@@ -47,13 +47,13 @@ def checkOffset(input_image, baseImage, Offsetx, Offsety):
 def resizeImage(orginalImage):
     grayImage = orginalImage.convert('L')
     npim = np.array(grayImage)
-    if(npim[192,100] > 11  or npim[192,903] > 11):
+    if(npim[192,100] > 12  or npim[192,903] > 12):
         print("250x250")
         return orginalImage
-    elif(npim[196,100] > 11  or npim[196,903] > 11):
+    elif(npim[196,100] > 12  or npim[196,903] > 12):
         print("500x500")
         return orginalImage.resize((2000,2000),PIL.Image.BICUBIC)
-    elif(npim[198,99] > 11 or npim[198,902] > 11):
+    elif(npim[198,99] > 12 or npim[198,902] > 12):
         print("750x750")
         return orginalImage.resize((3000,3000),PIL.Image.BICUBIC)
     else:

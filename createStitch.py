@@ -5,8 +5,8 @@ from PIL import Image, ImageOps, ImageDraw
 search_dir = "jpgs/"
 fileList = os.listdir('jpgs/')
 fileList.sort(key=lambda x: os.path.getmtime('jpgs/' + x))
-startFile = "3878924"
-#startFile = "3880088"
+#startFile = "3878924"
+startFile = "9271"
 #startFile = "23377"
 Bounds = {"minx" : 0, "miny": 0, "maxx": 0, "maxy": 0}
 
@@ -58,8 +58,12 @@ with open("sample.json", "r") as mapFile:
     cropped.save('map.png')
     draw = ImageDraw.Draw(cropped)
     for cen in centers.keys():
-        draw.ellipse((centers[cen][0]-10,centers[cen][1]-10,centers[cen][0]+10,centers[cen][1]+10), fill = 'red')
-    cropped.show()
+        draw.ellipse((centers[cen][0]-15,centers[cen][1]-15,centers[cen][0]+15,centers[cen][1]+15), fill = 'red')
+    png = cropped.reduce(4)
+    png.load() # required for png.split()
+    background = Image.new("RGB", png.size, (255, 255, 255))
+    background.paste(png, mask=png.split()[3])
+    background.save('dots.jpg', quality=90)
    
     json_object = json.dumps(centers, indent=2)
     with open("centers.json", "w") as outfile:
