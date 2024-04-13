@@ -2,6 +2,7 @@ import json
 import os
 from Stitch import resizeImage
 from PIL import Image, ImageOps, ImageDraw
+Image.MAX_IMAGE_PIXELS = 368956970
 search_dir = "jpgs/"
 fileList = os.listdir('jpgs/')
 fileList.sort(key=lambda x: os.path.getmtime('jpgs/' + x))
@@ -42,6 +43,7 @@ with open("sample.json", "r") as mapFile:
         node, ext = os.path.splitext(file)
         if node in Offsets:
             addIM = Image.open('jpgs/' + file)
+            print(file)
             addIM = resizeImage(addIM)
             addIM = addIM.reduce(4) #would be better to just make the resize work right, but this is fine for now.
             addMask = ImageOps.fit(mask, addIM.size, centering=(0.5, 0.5))
@@ -64,3 +66,7 @@ with open("sample.json", "r") as mapFile:
     background = Image.new("RGB", png.size, (255, 255, 255))
     background.paste(png, mask=png.split()[3])
     background.save('dots.jpg', quality=90)
+    
+    json_object = json.dumps(centers, indent=2)
+    with open("centers.json", "w") as outfile:
+        outfile.write(json_object)
