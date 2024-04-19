@@ -2,16 +2,19 @@ import os
 import hashlib
 import cherrypy
 import cherrypy_cors
+import io
+from PIL import Image
 
 imgs = os.listdir("jpgs")
 
 images = {}
+tempHash = {}
 
 for img in imgs:
     file = open("jpgs/" + img, "rb")
     readFile = file.read()
     sha256Hash = hashlib.sha256(readFile).hexdigest()
-    print(sha256Hash)
+    #print(sha256Hash)
     images[img[:-4]] = sha256Hash
     file.close()
 
@@ -26,13 +29,13 @@ class myWebServer(object):
         if cherrypy.request.method == 'POST':
             input_json = cherrypy.request.json
             if (str(input_json["id"]) in images) and (input_json["hash"] == images[str(input_json["id"])]):
-                print("Image already obtained")
+                print("Image already obtained: ID:" + str(input_json["id"]))
                 return "OK"
             print("New Image Seen")
             print("ID:" + str(input_json["id"]))
             print("hash:" + input_json["hash"])
             print("myhash:" + images.get(str(input_json["id"]), "None"))
-            images[str(input_json["id"])] = input_json["hash"]
+            tempHash[str(input_json["id"])] = input_json["hash"]
             return "NEED"
         
         return {'method': 'non-POST'}
@@ -45,21 +48,36 @@ class myWebServer(object):
 
         upload_path = os.path.normpath('jpgs/')
         upload_file = os.path.join(upload_path, ufile.filename)
-        size = 0
-        print(upload_file)
-        with open(upload_file, 'wb') as out:
-            while True:
-                data = ufile.file.read(8192)
-                if not data:
-                    break
-                out.write(data)
-                size += len(data)
-        out = '''
-length: {}
-filename: {}
-mime-type: {}
-''' .format(size, ufile.filename, ufile.content_type, data)
-        return out
+        ba = bytearray()
+        while True:
+            data = ufile.file.read(8192)
+            if not data:
+                break
+            ba.extend(data)
+        sha256Hash = hashlib.sha256(ba).hexdigest()
+        if tempHash[ufile.filename[:-4]] != sha256Hash:
+            print("Image doesn't match sent hash, abort")
+            return "Hash Mismatch"
+        try:
+            print(upload_file)
+            image = Image.open(io.BytesIO(ba))
+            print("Image Opened")
+            image.crop()
+            with open(upload_file, 'wb') as out:
+                out.write(ba)
+                images[ufile.filename[:-4]] = sha256Hash
+                
+                message = '''
+                    length: {}
+                    filename: {}
+                    mime-type: {}
+                    ''' .format(len(ba), ufile.filename, ufile.content_type)
+                return message
+        except Exception as e:
+            print("Something Broke")
+            print(e)
+            return "Failure"
+        return "Failed"
 
 cherrypy_cors.install()
 #  Setup the HTTP server that will always run

@@ -1,7 +1,7 @@
 import json
 import os
 from Stitch import resizeImage
-from PIL import Image, ImageOps, ImageDraw
+from PIL import Image, ImageOps, ImageDraw, ImageFont
 Image.MAX_IMAGE_PIXELS = 368956970
 search_dir = "jpgs/"
 fileList = os.listdir('jpgs/')
@@ -59,8 +59,13 @@ with open("sample.json", "r") as mapFile:
     cropped = Canvas.crop(imageBox)
     cropped.save('map.png')
     draw = ImageDraw.Draw(cropped)
+    #fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMono.ttf", 10)
     for cen in centers.keys():
         draw.ellipse((centers[cen][0]-15,centers[cen][1]-15,centers[cen][0]+15,centers[cen][1]+15), fill = 'red')
+        for adj in Adj[cen].keys():
+            if adj in centers:
+                draw.line((centers[cen][0], centers[cen][1], centers[adj][0], centers[adj][1]), fill='black', width = 4)
+        #draw.text((centers[cen][0],centers[cen][1]-15),str(cen), font=fnt, fill = 'black')
     png = cropped.reduce(4)
     png.load() # required for png.split()
     background = Image.new("RGB", png.size, (255, 255, 255))

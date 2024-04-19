@@ -11,11 +11,11 @@ with open("sample.json", "r") as mapFile:
 
 print("file Open")
 with requests.Session() as s:
-    p = s.post("https://soul-forged-resourcs-map.vercel.app/getDataSet", data={"item": "mapRouteMain"})
+    p = s.post("https://sf.crow.tw/getDataSet", data={"item": "mapRouteMain"})
     MapPaths = json.loads(p.text.replace("\'", "\""))
     print("Path Dataset")
     
-    p = s.post("https://soul-forged-resourcs-map.vercel.app/getDataSet", data={"item": "nodeMaping"})
+    p = s.post("https://sf.crow.tw/getDataSet", data={"item": "nodeMaping"})
     nodeMapping = json.loads(p.text.replace("\'", "\""))
     nodeMap = dict((v,k) for k,v in nodeMapping.items())
     print("Node Dataset")
