@@ -43,10 +43,12 @@ with open("sample.json", "r") as mapFile:
         node, ext = os.path.splitext(file)
         if node in Offsets:
             addIM = Image.open('jpgs/' + file)
-            print(file)
+            #print(file)
             addIM = resizeImage(addIM)
             addIM = addIM.reduce(4) #would be better to just make the resize work right, but this is fine for now.
+            
             addMask = ImageOps.fit(mask, addIM.size, centering=(0.5, 0.5))
+            
             addIM.putalpha(addMask.convert('1'))
             
             diffx = Offsets[node][0] // 4 - Bounds["minx"]
@@ -55,18 +57,19 @@ with open("sample.json", "r") as mapFile:
             Canvas.paste(addIM, (diffx, diffy), addIM)
             center = addIM.size[0]/2
             centers[node] = ((diffx + center), (diffy + center))
+    print("cropping")
     imageBox = Canvas.getbbox()
-    cropped = Canvas.crop(imageBox)
-    cropped.save('map.png')
-    draw = ImageDraw.Draw(cropped)
-    #fnt = ImageFont.truetype("Pillow/Tests/fonts/FreeMono.ttf", 10)
+    Canvas = Canvas.crop(imageBox)
+    print("saving")
+    Canvas.save('map.png')
+    draw = ImageDraw.Draw(Canvas)
     for cen in centers.keys():
         draw.ellipse((centers[cen][0]-15,centers[cen][1]-15,centers[cen][0]+15,centers[cen][1]+15), fill = 'red')
         for adj in Adj[cen].keys():
             if adj in centers:
                 draw.line((centers[cen][0], centers[cen][1], centers[adj][0], centers[adj][1]), fill='black', width = 4)
-        #draw.text((centers[cen][0],centers[cen][1]-15),str(cen), font=fnt, fill = 'black')
-    png = cropped.reduce(4)
+    print("pasting")
+    png = Canvas.reduce(4)
     png.load() # required for png.split()
     background = Image.new("RGB", png.size, (255, 255, 255))
     background.paste(png, mask=png.split()[3])

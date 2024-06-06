@@ -48,16 +48,19 @@ def resizeImage(orginalImage):
     grayImage = orginalImage.convert('L')
     npim = np.array(grayImage)
     if(npim[192,100] > 12  or npim[192,903] > 12):
-        print("250x250")
+        print("1x")
         return orginalImage
     elif(npim[196,100] > 12  or npim[196,903] > 12):
-        print("500x500")
+        print("2x")
         return orginalImage.resize((2000,2000),PIL.Image.BICUBIC)
+    elif(npim[197,99] > 30 or npim[197,902] > 30): #Seems to be a single image, which is why I set this threshold so high.
+        print("2.5x")
+        return orginalImage.resize((2500,2500),PIL.Image.BICUBIC)
     elif(npim[198,99] > 12 or npim[198,902] > 12):
-        print("750x750")
+        print("3x")
         return orginalImage.resize((3000,3000),PIL.Image.BICUBIC)
     else:
-        print("1000x1000")
+        print("4x")
         return orginalImage.resize((4000,4000),PIL.Image.BICUBIC)
 
 def ImageOffset(inputFile, baseFile):
